@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="generator" content="Hugo 0.48" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pannellum</title>
+<script src="/cdn-cgi/apps/head/yVhd-NzaByDzTOZSjIXbC0Gj_AI.js"></script>
+<link rel="stylesheet" href="https://pannellum.org/css/bootstrap.min.css" />
+<script type="text/javascript" src="https://pannellum.org/js/bootstrap-native.min.js"></script>
+<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600%7CSource+Code+Pro:400,600' rel='stylesheet' type='text/css' />
+<link rel="stylesheet" href="https://pannellum.org/css/pygments.css" />
+<link rel="stylesheet" href="https://cdn.pannellum.org/2.4/pannellum.css" />
+<script type="text/javascript" src="https://cdn.pannellum.org/2.4/pannellum.js"></script>
+<link rel="stylesheet" href="https://pannellum.org/css/style.css">
+<style>
+  html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+    }
+  /* #slide-box{
+      width:100%;
+      z-index: 10000;
+      position: absolute;
+      bottom: 80px;
+      display: -webkit-box;
+      overflow-x: scroll;
+      background: rgba(0,0,0,0.4);
+      -webkit-overflow-scrolling:touch;
+    } */
+</style>
+</head>
+<body>
+<div id="panorama" style="width:100%;height:100vh;"></div>
+
+<script>
+
+
+function bootstrapJS(data,index){
+
+    let is;
+    let url = data[index].imgpath;
+    let hotSpots = [];
+    for (let i=0;i<data[index].point.length;i++) {
+      is = data[index].point[i].sceneId;
+      hotSpots.push(
+        {
+          "pitch":data[index].point[i].x,
+          "yaw":data[index].point[i].y,
+          "type": "scene",
+          "sceneId":data[index].point[i].sceneId
+        }
+      )
+    }
+    pannellum.viewer('panorama', {
+       "default": {
+        "firstScene": data[index].point[0]['sceneId'],
+        "autoLoad": true,
+        "showControls":false,
+        "minHfov":50,
+        "maxHfov":60
+      },
+    
+      "scenes":(function(){
+        let a ={};
+
+        let point = data[index].point;
+        for (let i=0;i<point.length;i++) {
+            let {sceneId,x,y} = point[i];
+            let sUrl = data.filter(v=>v.ids==sceneId);
+            if(sUrl.length) sUrl = sUrl[0].imgpath;
+            else sUrl = ""
+            a[sceneId] = {
+                "hfov": 50,
+                "pitch": 10,
+                "yaw": 50,
+                "type": "equirectangular",
+                "panorama": sUrl,
+                "hotSpots":hotSpots
+            }
+        }
+
+
+
+
+
+        // return {
+        //    "library":{
+        //         "hfov": 50,
+        //         "pitch": 10,
+        //         "yaw": 50,
+        //         "type": "equirectangular",
+        //         "panorama": '444.jpg',
+        //         "hotSpots":hotSpots
+        //       }
+        //   }
+        // for (let i=0;i<data[index].point.length;i++) {
+      //   is = data[index].point[i].sceneId;
+      //   hotSpots.push(
+      //   {
+      //     "pitch":data[index].point[i].x,
+      //     "yaw":data[index].point[i].y,
+      //     "type": "scene",
+      //     "sceneId":data[index].point[i].sceneId
+      //   }
+      // )
+
+
+        // a.push({
+        //   "hfov": 50,
+        //   "pitch": 10,
+        //   "yaw": 50,
+        //   "type": "equirectangular",
+        //   "panorama":url,
+        //   "hotSpots":hotSpots,
+        //   "sceneId":data[index].point[i].sceneId
+        // })
+
+
+        // a[data[index].point[i].sceneId]={
+        //     "hfov": 50,
+        //     "pitch": 10,
+        //     "yaw": 50,
+        //     "type": "equirectangular",
+        //     "panorama": url,
+        //     "hotSpots":hotSpots
+        // }
+        // a['library']['hotSpots'].push()       
+      // }
+      
+         return a
+      }())
+      //  {
+      //   "library": {
+      //       "hfov": 50,
+      //       "pitch": 10,
+      //       "yaw": 50,
+      //       "type": "equirectangular",
+      //       "panorama": url,
+      //       "hotSpots":hotSpots
+      //   },
+        
+        
+
+        // "gallery": {
+        //     "hfov": 100,
+        //     "yaw": -20,
+        //     "type": "equirectangular",
+        //     "panorama": "http://192.168.1.126:3099/example/444.jpg",
+        //     "hotSpots": [
+        //         {
+        //             "pitch": -7,
+        //             "yaw": -58,
+        //             "type": "scene",
+        //             "text": "Library",
+        //             "sceneId": "library",
+        //             "targetYaw": 240
+        //         }
+        //     ]
+        // },
+        
+        // "6th-floor": {
+        //     "hfov": 100,
+        //     "pitch": -20,
+        //     "yaw": -20,
+        //     "northOffset": 0,
+        //     "type": "equirectangular",
+        //     "panorama": "http://192.168.1.126:3099/example/555.jpg",
+        //     "hotSpots": [
+        //         {
+        //             "pitch": -47.5,
+        //             "yaw": -11,
+        //             "type": "scene",
+        //             "text": "Main Floor",
+        //             "sceneId": "library"
+        //         },
+        //         {
+        //             "pitch": -28,
+        //             "yaw": -3,
+        //             "type": "scene",
+        //             "text": "Gallery",
+        //             "sceneId": "gallery"
+        //         }
+        //     ]
+        // }
+    });
+}
+</script>
+</div>
+</body>
+</html>

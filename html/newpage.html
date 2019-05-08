@@ -1,0 +1,83 @@
+<!-- <html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+	<style type="text/css">
+		body, html,#allmap {width: 100%;height: 100%;margin:0;padding:0}
+	</style>
+</head>
+<body>
+    <div id="allmap"></div>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=nNsj2hHmlQjt48iaOhGWGLl0TF5pOPRR"></script>
+    <script>
+        // 百度地图API功能
+        // runMap(116.397559,39.89621)
+    function runMap(x,y){
+        
+            var map = new BMap.Map("allmap");
+                map.centerAndZoom(new BMap.Point(x,y), 9);
+                map.enableScrollWheelZoom(true);
+    
+            let geoc = new BMap.Geocoder();
+            
+        
+                map.addEventListener("click", (e) => { // 点击地图获得信息
+                    map.clearOverlays();    //清除上一次的标记点     
+                    let  pt = e.point;
+                    console.log(pt,">>>>>>>>>>>>>>>>>>>")
+                    map.removeOverlay(new BMap.Marker(pt));
+                
+                    let point = new BMap.Point(pt.lng,pt.lat);
+                    let marker = new BMap.Marker(point);
+                        map.addOverlay(marker);
+    
+                    //标点
+                    var pts = new BMap.Point(pt.lng,pt.lat);
+                    var myIcon = new BMap.Icon("http://lbsyun.baidu.com/jsdemo/img/fox.gif", new BMap.Size(300,157));
+                    var marker2 = new BMap.Marker(pts,{icon:myIcon});  // 创建标注
+                        map.addOverlay(marker2);
+    
+                    geoc.getLocation(pt, (rs) => {
+                        console.log(rs,">>>>>>>>>>>>>>>>>>>")
+                    let addComp = rs.addressComponents;
+                    const {province,city,district,street,streetNumber}  = addComp;
+    
+                    let address = '';
+                        if(province && province != '') address += `${province}`;
+                        if(city && city != '') address += `, ${city}`;
+                        if(district && district != '') address += `, ${district}`;
+                        if(street && street != '') address += `, ${street}`;
+                        if(streetNumber && streetNumber != '') address += `, ${streetNumber}`;
+    
+                    let result = {point : pt, addressStr : address, address : addComp};
+    
+                    console.log({point : pt, addressStr : address, address : addComp})
+    
+                    window.postMessage(JSON.stringify(result));
+                    });
+    
+          });
+          } 
+    
+          //运行地图
+          /***
+            参数说明 中心坐标  开始坐标  结束坐标
+           **/
+        
+    </script>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    
+</body>
+</html>

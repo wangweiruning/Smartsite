@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PhotoSphereViewer - equirectangular demo</title>
+  <link rel="shortcut icon" href="#" />
+  <link rel="stylesheet" href="../dist/photo-sphere-viewer.css">
+  <style>
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+    }
+
+    #photosphere {
+      width: 100%;
+      height: 100%;
+    }
+
+    .psv-button.custom-button {
+      font-size: 22px;
+      line-height: 20px;
+    }
+
+    .demo-label {
+      color: white;
+      font-size: 20px;
+      font-family: Helvetica, sans-serif;
+      text-align: center;
+      padding: 5px;
+      border: 1px solid white;
+      background: rgba(0,0,0,0.4);
+    }
+
+    #slide-box{
+      display:none;
+      width:100%;
+      z-index: 10000;
+      position: absolute;
+      bottom: 80px;
+      display: -webkit-box;
+      overflow-x: scroll;
+      background: rgba(0,0,0,0.4);
+      -webkit-overflow-scrolling:touch;
+    }
+  </style>
+</head>
+<body>
+
+<div id="photosphere"></div>
+<div id="slide-box"></div>
+
+<div id="open" onclick="open()" style="display:flex;align-items:center;position:absolute;left:15px;flex-direction:column;z-index:10000;padding:0;bottom:14px">
+  <div style="display:flex;align-items:center;justify-content:center;background:white;border-radius:20px;width:37px;height:37px">
+    <img src='meue.png' style="width:20px;height:20px" />
+  </div>
+  <p style="color:white;font-size:10px;margin:8px 0px 0px">场景切换</p>
+</div>
+
+<script src="../node_modules/three/build/three.js"></script>
+<script src="../node_modules/promise-polyfill/dist/polyfill.js"></script>
+<script src="../node_modules/uevent/uevent.js"></script>
+<script src="../node_modules/dot/doT.js"></script>
+<script src="../node_modules/nosleep.js/dist/NoSleep.js"></script>
+<script src="../node_modules/three/examples/js/controls/DeviceOrientationControls.js"></script>
+<script src="../node_modules/three/examples/js/effects/StereoEffect.js"></script>
+<script src="../dist/photo-sphere-viewer.js"></script>
+
+<!-- pattern used for the polygon marker -->
+
+
+<script>
+  var panos = [
+    {
+      url: 'Bryce-Canyon-National-Park-Mark-Doliner.jpg',
+      target: {
+        longitude: 3.848,
+        latitude: -0.244,
+        zoom: 50
+      }
+    }, {
+      url: 'Bryce-Canyon-By-Jess-Beauchemin.jpg',
+      target: {
+        longitude: 3.715,
+        latitude: 0.574,
+        zoom: 50
+      },
+    }
+  ];
+  var psv;
+  function sasd(i,e,path){
+    alert(e+'===>'+path)
+    psv.setPanorama(path).then(function() {
+        //   PSV.updateMarker({
+        //   id: marker.id,
+        //   longitude: 1.5,
+        //   latitude: -0.2,
+        // });
+      });
+
+  }
+
+  function open(){
+    document.getElementById('slide-box').style.display=''
+  }
+
+  function showhidediv(id){
+  var sbtitle=document.getElementById(id);
+if(sbtitle){
+   if(sbtitle.style.display=='block'){
+   sbtitle.style.display='none';
+   }else{
+   sbtitle.style.display='block';
+   }
+}
+}  
+
+
+  function bootstrapJS(data){
+    var ele = document.getElementById('slide-box')
+    var str = '';
+    var point = [];
+    for(let i = 0;i<data.length;i++){
+      try{
+        point = data[i].point;
+        let imgpath = data[i].imgpath;
+        str += `<div data-asd="${imgpath}" onclick="sasd(${i},this)" style="margin-top:7px;margin-bottom:7px;margin-right:7px;width:80px;height:80px;background-color:rgba(0,0,0,.3);display:flex;flex-direction:column;align-items:center;">
+         <img src=${data[i].img} style="width:80px;height:65px"/>
+         <p style="color:white;font-size:10px">${data[i].text}</p>
+        </div>`
+      }catch(e){
+        alert(e)
+      }
+    }
+    ele.innerHTML=str
+    var PSV = new PhotoSphereViewer({
+    container: 'photosphere',
+    loading_img: 'assets/photosphere-logo.gif',
+    panorama:panos[0].url,
+    // longitude_range: [-7 * Math.PI / 8, 7 * Math.PI / 8],
+    // latitude_range: [-3 * Math.PI / 4, 3 * Math.PI / 4],
+    anim_speed: '-2rpm',
+    default_fov: 90,
+    fisheye: true,
+    move_speed: 1.1,
+    time_anim: false,
+//    touchmove_two_fingers: true,
+//    mousemove_hover: true,
+    navbar:false,
+    markers:(function() {
+      var a = [];
+      for (var i = 0; i < point.length;i++) {
+          a.push({
+            id: `text${i}`,
+            longitude: point[i].x,
+            latitude: point[i].y,
+            html: `<p style="background:rgba(0,0,0,.4);margin-bottom:10px;padding:4px;letter-spacing:2px">${data[i].text}</p><img src=assets/pin2.png style="width:32px;height:32px"/>`,
+            anchor: 'bottom right',
+            scale: [0.5, 1.5],
+            style: {
+              color: 'white',
+              fontSize: '20px',
+              fontFamily: 'Helvetica, sans-serif',
+              textAlign: 'center'
+            }
+          });
+      }
+      return a;
+      }())
+    });
+
+    psv = PSV
+    PSV.on('select-marker', function(marker,click) {
+    PSV.clearMarkers();
+    PSV.setPanorama('Bryce-Canyon-By-Jess-Beauchemin.jpg').then(function() {
+          PSV.updateMarker({
+          id: marker.id,
+          longitude: 1.5,
+          latitude: -0.2,
+        });
+      });
+    });
+  }
+
+  
+</script>
+</body>
+</html>

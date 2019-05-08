@@ -1,0 +1,61 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+	<style>
+		body, html,#container {
+      width: 100%;
+      height: 100%;
+    }
+	</style>
+   
+</head>
+<body>
+	<div id="container"></div>
+ <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=nNsj2hHmlQjt48iaOhGWGLl0TF5pOPRR"></script>
+<script type="text/javascript">
+    // 百度地图API功能
+function runMap(x,y,action,end,goaction,goend){
+        var map = new BMap.Map("container");
+        map.centerAndZoom(new BMap.Point(x,y), 14);
+        map.enableScrollWheelZoom(true);
+        
+        var p1 = new BMap.Point(action,end);//开始位置
+        var p2 = new BMap.Point(goaction,goend);//结束位置
+        var output = "到达目的地需要";
+        var driving = new BMap.DrivingRoute(map, {renderOptions:{map: map, autoViewport: true},
+                    onPolylinesSet:function(routes) {
+                        searchRoute = routes[0].getPolyline();//导航路线
+                        map.addOverlay(searchRoute);
+            }
+        });
+
+        driving.setSearchCompleteCallback(function(res){
+         var plan = driving.getResults().getPlan(0);
+            output += plan.getDuration(true) + "\n";                //获取时间
+            output += "总路程为：" ;
+            output += plan.getDistance(true) + "\n";             //获取距离
+            let result = {distance:plan.getDistance(true),time:plan.getDuration(true)}; 
+            console.log(output,">>>>>>>>>>>>>>>>>>>>")
+            window.postMessage(JSON.stringify(result));
+
+          for(var i=0;i<plan.getNumRoutes();i++){
+            var pts =plan.getRoute(i).getPath();
+　　　　//重点在这   这个地方是关于修改颜色的
+            var polyline = new BMap.Polyline(pts,{ strokeColor: "#44b5c7", strokeWeight: 8, strokeOpacity: 1 });
+        map.addOverlay(polyline);
+          }
+        })
+        driving.search(p1, p2);
+      }
+
+      //运行地图
+      /***
+        参数说明 中心坐标  开始坐标  结束坐标
+       **/
+      // runMap(116.397559,39.89621,116.303843, 39.983412,117.321354, 33.896436)
+</script>
+
+</body>
+</html>
